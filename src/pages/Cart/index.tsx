@@ -27,6 +27,14 @@ import { useCart } from '../../hooks/cart';
 
 import formatValue from '../../utils/formatValue';
 
+interface FloatingCartValue {
+  total: number;
+}
+
+interface FloatingCartQuantity {
+  quantity: number;
+}
+
 interface Product {
   id: string;
   title: string;
@@ -39,23 +47,39 @@ const Cart: React.FC = () => {
   const { increment, decrement, products } = useCart();
 
   function handleIncrement(id: string): void {
-    // TODO
+    increment(id);
   }
 
   function handleDecrement(id: string): void {
-    // TODO
+    decrement(id);
   }
 
   const cartTotal = useMemo(() => {
-    // TODO RETURN THE SUM OF THE QUANTITY OF THE PRODUCTS IN THE CART
+    const { total } = products.reduce(
+      (accumulator: FloatingCartValue, product) => {
+        accumulator.total += product.quantity * product.price;
+        return accumulator;
+      },
+      {
+        total: 0,
+      },
+    );
 
-    return formatValue(0);
+    return formatValue(total);
   }, [products]);
 
   const totalItensInCart = useMemo(() => {
-    // TODO RETURN THE SUM OF THE QUANTITY OF THE PRODUCTS IN THE CART
+    const { quantity } = products.reduce(
+      (accumulator: FloatingCartQuantity, product) => {
+        accumulator.quantity += product.quantity;
+        return accumulator;
+      },
+      {
+        quantity: 0,
+      },
+    );
 
-    return 0;
+    return quantity;
   }, [products]);
 
   return (
@@ -68,7 +92,7 @@ const Cart: React.FC = () => {
           ListFooterComponentStyle={{
             height: 80,
           }}
-          renderItem={({ item }: { item: Product }) => (
+          renderItem={({ item }) => (
             <Product>
               <ProductImage source={{ uri: item.image_url }} />
               <ProductTitleContainer>
